@@ -17,8 +17,10 @@
 package com.derpquest.settings.fragments.lockscreen;
 
 import android.app.WallpaperManager;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
@@ -62,6 +64,10 @@ public class LockscreenGeneral extends SettingsPreferenceFragment implements
     private static final String LOCK_DATE_FONTS = "lock_date_fonts";
     private static final String AMBIENT_ICONS_COLOR = "ambient_icons_color";
     private static final String KEY_LOCKSCREEN_BLUR = "lockscreen_blur";
+    private static final String AMBIENT_IMAGE_FILE_SELECT = "ambient_custom_image";
+    private static final int REQUEST_PICK_AMBIENT_IMAGE = 12;
+    private static final String AMBIENT_TEXT_BACKGROUND = "ambient_text_background";
+    private static final int REQUEST_PICK_AMBIENT_TEXT_BACKGROUND = 18;
 
     static final int MODE_DISABLED = 0;
     static final int MODE_NIGHT = 1;
@@ -74,6 +80,8 @@ public class LockscreenGeneral extends SettingsPreferenceFragment implements
     private ColorPickerPreference mAmbientIconsColor;
     private SystemSettingListPreference mBatteryTempUnit;
     private SystemSettingSeekBarPreference mLockscreenBlur;
+    private Preference mAmbientImageSelect;
+    private Preference mAmbientTextSelect;
 
     Preference mAODPref;
 
@@ -124,6 +132,9 @@ public class LockscreenGeneral extends SettingsPreferenceFragment implements
 
         mAODPref = findPreference(AOD_SCHEDULE_KEY);
         updateAlwaysOnSummary();
+
+        mAmbientImageSelect = findPreference(AMBIENT_IMAGE_FILE_SELECT);
+        mAmbientTextSelect = findPreference(AMBIENT_TEXT_BACKGROUND);
     }
 
     @Override
@@ -154,6 +165,22 @@ public class LockscreenGeneral extends SettingsPreferenceFragment implements
                 mAODPref.setSummary(R.string.always_on_display_schedule_mixed_sunrise);
                 break;
         }
+    }
+
+    @Override
+    public boolean onPreferenceTreeClick(Preference preference) {
+        if (preference == mAmbientImageSelect) {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, REQUEST_PICK_AMBIENT_IMAGE);
+            return true;
+        } else if (preference == mAmbientTextSelect) {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, REQUEST_PICK_AMBIENT_TEXT_BACKGROUND);
+            return true;
+        }
+        return super.onPreferenceTreeClick(preference);
     }
 
     public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -189,6 +216,23 @@ public class LockscreenGeneral extends SettingsPreferenceFragment implements
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent result) {
+        if (requestCode == REQUEST_PICK_AMBIENT_IMAGE) {
+            if (resultCode != Activity.RESULT_OK) {
+                return;
+            }
+            final Uri imageUri = result.getData();
+            Settings.System.putString(getContentResolver(), Settings.System.AMBIENT_CUSTOM_IMAGE, imageUri.toString());
+        } else if (requestCode == REQUEST_PICK_AMBIENT_TEXT_BACKGROUND) {
+            if (resultCode != Activity.RESULT_OK) {
+                return;
+            }
+            final Uri imageUri = result.getData();
+            Settings.System.putString(getContentResolver(), Settings.System.AMBIENT_TEXT_GRAVITY, imageUri.toString());
+        }
     }
 
     @Override
