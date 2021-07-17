@@ -73,7 +73,7 @@ public class LockscreenGeneral extends SettingsPreferenceFragment implements
     private ListPreference mLockDateFonts;
     private ColorPickerPreference mAmbientIconsColor;
     private SystemSettingListPreference mBatteryTempUnit;
-    private SystemSettingSeekBarPreference mLockscreenBlur;
+    private Preference mLockscreenBlur;
 
     Preference mAODPref;
 
@@ -116,7 +116,7 @@ public class LockscreenGeneral extends SettingsPreferenceFragment implements
         mAmbientIconsColor.setOnPreferenceChangeListener(this);
 
         ParcelFileDescriptor pfd = manager.getWallpaperFile(WallpaperManager.FLAG_LOCK);
-        mLockscreenBlur = (SystemSettingSeekBarPreference) findPreference(KEY_LOCKSCREEN_BLUR);
+        mLockscreenBlur = (Preference) findPreference(KEY_LOCKSCREEN_BLUR);
         if (!com.derpquest.settings.utils.Utils.isBlurSupported() || pfd != null) {
             mLockscreenBlur.setEnabled(false);
             mLockscreenBlur.setSummary(getString(R.string.lockscreen_blur_disabled));
